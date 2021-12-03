@@ -1,113 +1,94 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li>
-        <a
-          href="https://vuejs.org"
-          target="_blank"
-        >
-          Core Docs
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://forum.vuejs.org"
-          target="_blank"
-        >
-          Forum
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://chat.vuejs.org"
-          target="_blank"
-        >
-          Community Chat
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://twitter.com/vuejs"
-          target="_blank"
-        >
-          Twitter
-        </a>
-      </li>
-      <br>
-      <li>
-        <a
-          href="http://vuejs-templates.github.io/webpack/"
-          target="_blank"
-        >
-          Docs for This Template
-        </a>
-      </li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li>
-        <a
-          href="http://router.vuejs.org/"
-          target="_blank"
-        >
-          vue-router
-        </a>
-      </li>
-      <li>
-        <a
-          href="http://vuex.vuejs.org/"
-          target="_blank"
-        >
-          vuex
-        </a>
-      </li>
-      <li>
-        <a
-          href="http://vue-loader.vuejs.org/"
-          target="_blank"
-        >
-          vue-loader
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/awesome-vue"
-          target="_blank"
-        >
-          awesome-vue
-        </a>
-      </li>
-    </ul>
-  </div>
+<div class="hello">
+    <span>Transactions</span><br>
+    <input v-model="value" type="number">
+    <button @click="GetAverage()">Submit</button>
+    <p>
+        Average : {{average}}
+    </p>
+    <br>
+    <br>
+    <center>
+        <table border="1px solid">
+            <thead>
+                <tr>
+                    <th>Transaction</th>
+                    <th>Average</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr v-for="(list, n) in outputs" :key="n">
+                    <td>{{list.new}}</td>
+                    <td>{{list.average}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </center>
+
+</div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App'
+    name: 'HelloWorld',
+    data() {
+        return {
+            value: "",
+            oldValue: 0,
+            newValue: 0,
+            average: 0,
+            outputs: [],
+            new_ave : 0,
+        }
+    },
+    mounted() {
+        this.outputs = JSON.parse(localStorage.getItem('lists'));
+
+    },
+    watch: {
+        value(newValue, oldValue) {
+            this.oldValue = oldValue,
+            this.newValue = newValue
+        }
+
+    },
+    methods: {
+        GetAverage() {
+
+            var Transactions = {
+                "old": this.oldValue,
+                "new": this.newValue,
+                "average": (parseInt(this.newValue) + parseInt(this.oldValue)) / 2
+
+            };
+
+            var lists = [];
+            lists.push(Transactions);
+            this.outputs = lists;
+
+            if (this.oldValue) {
+                this.average = (parseInt(this.newValue) + parseInt(this.oldValue)) / 2
+                this.value = ''
+                this.saveNums()
+            } else {
+                this.average = this.newValue
+                this.value = ''
+                this.saveNums()
+            }
+
+            // this.new_ave = (parseInt( this.average) + parseInt(this.newValue)) / 2
+            // console.log()
+        },
+        saveNums() {
+            const parsed = JSON.stringify(this.outputs);
+            localStorage.setItem('outputs', parsed);
+        }
     }
-  }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+
 <style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+
 </style>
